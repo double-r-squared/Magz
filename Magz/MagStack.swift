@@ -4,7 +4,6 @@ import UIKit
 class MagStackView<Item>: UIView {
     
     // MARK: - Properties
-
     private var items: [Item]
     private var views: [UIView]
     private var builder: (Item) -> UIView
@@ -54,7 +53,8 @@ class MagStackView<Item>: UIView {
 
             // Initial transform
             positionView(view, at: index)
-        }
+            
+            }
     }
 
     // MARK: - Layout & Transform
@@ -106,7 +106,7 @@ class MagStackView<Item>: UIView {
             }
         }
     }
-
+    
     // MARK: - Public
 
     func toggleStacking() {
