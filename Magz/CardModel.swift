@@ -6,7 +6,6 @@
 //
 
 import Foundation
-
 struct CardModel: Decodable {
     let identifier: String
     var thumbnailURL: URL? {
@@ -15,3 +14,4 @@ struct CardModel: Decodable {
             //"https://archive.org/services/img/\(identifier)")
     }
 }
+

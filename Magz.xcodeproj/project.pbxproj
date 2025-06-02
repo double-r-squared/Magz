@@ -58,6 +58,11 @@
 			path = MagzUITests;
 			sourceTree = "<group>";
 		};
+		E8F9E91A2DEE150E008A32D3 /* ToAdd */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ToAdd;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +97,7 @@
 				E863A25E2DCAA737009ED964 /* MagzTests */,
 				E863A2682DCAA737009ED964 /* MagzUITests */,
 				E863A2462DCAA735009ED964 /* Products */,
+				E8F9E91A2DEE150E008A32D3 /* ToAdd */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,6 +128,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				E863A2472DCAA735009ED964 /* Magz */,
+				E8F9E91A2DEE150E008A32D3 /* ToAdd */,
 			);
 			name = Magz;
 			packageProductDependencies = (
