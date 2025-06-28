@@ -7,11 +7,16 @@
 
 import Foundation
 
-//TODO: Select from offline lcoal storage files
+//This will be mainly in SwiftIUi For ease
+//Implement the router extension
+
+//TODO: Select from offline lcoal storage files: BUTTON
+//Navlink ->
 //IMPORT PATHS
 //DOCUMENT PICKER
 
-//TODO: Select from internet archive, Public Domain etc etc
+//TODO: Select from internet archive, Public Domain etc etc: BUTTON
+//Navlink ->
 //BROWSE COllECTIONS
 
 //TODO: Settings:

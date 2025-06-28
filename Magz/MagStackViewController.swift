@@ -58,6 +58,68 @@ class CardStackViewController: UIViewController {
         }
     }
     
+    private func addCardToBack() {
+        // Get next model/image (simulate more content)
+        guard cards.count < service.allModels.count else { return }
+
+        let nextModel = service.allModels[cards.count]
+        
+        guard let url = nextModel.thumbnailURL else { return }
+
+        // Fetch the image
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data, let image = UIImage(data: data) else { return }
+
+            DispatchQueue.main.async {
+                self.cards.append((nextModel, image))
+                
+                let cardView = self.createCardView(for: nextModel, image: image)
+                let index = self.cards.count
+
+                self.adjustCardPosition(cardView, at: index)
+                self.view.insertSubview(cardView, at: 0) // bottom of stack
+            }
+
+        }.resume()
+    }
+
+    
+    private func removeCard(_ cardView: UIView) {
+        guard let index = view.subviews
+            .filter({ $0.gestureRecognizers?.contains(where: { $0 is UIPanGestureRecognizer }) == true })
+            .firstIndex(of: cardView) else { return }
+
+        // Remove the corresponding card from data model (if needed)
+        if index < cards.count {
+            cards.remove(at: index)
+        }
+
+        cardView.removeFromSuperview()
+
+        // Re-adjust remaining cards
+        let remainingCards = view.subviews
+            .filter { $0 != cardView && $0.gestureRecognizers?.contains(where: { $0 is UIPanGestureRecognizer }) == true }
+            .sorted { $0.layer.zPosition > $1.layer.zPosition } // top to bottom
+
+        for (i, card) in remainingCards.enumerated() {
+            UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+                self.adjustCardPosition(card, at: i + 1)
+            }, completion: nil)
+        }
+    }
+
+    private func adjustCardPosition(_ cardView: UIView, at index: Int) {
+        
+        let scale = 1.0 - (CGFloat(index - 1) * scaleDecrement)
+        let yOffset = CGFloat(index - 1) * verticalSpacing
+        
+        cardView.transform = CGAffineTransform(scaleX: scale, y: scale)
+            .concatenating(CGAffineTransform(translationX: 0, y: -yOffset))
+        cardView.layer.setValue(cardView.transform, forKey: "originalTransform")
+        cardView.layer.zPosition = CGFloat(maxCardsVisible - index)
+                
+    }
+    
     
     private func createCardView(for model: CardModel, image: UIImage) -> UIView {
         let imageSize = image.size
@@ -133,8 +195,8 @@ class CardStackViewController: UIViewController {
                     //TODO: ENTER PDF VIEW
                     
                     // Calculate transparency for other cards based on right drag progress
-                    let progress = min(1.0, (translation.x - rightHapticThreshold) / (view.bounds.width/2 - rightHapticThreshold))
-                    setTransparencyForOtherCards(relativeTo: cardView, alpha: 1 - progress)
+                    let progress = min(1.0, (translation.x - rightHapticThreshold) / (view.bounds.width/1.5))
+                    setTransparencyForOtherCards(relativeTo: cardView, alpha: 1.0 - progress)
                 } else {
                     cardView.layer.setValue(false, forKey: "rightHapticTriggered")
                     // Reset transparency if not dragging right enough
@@ -150,13 +212,6 @@ class CardStackViewController: UIViewController {
                     }
                     
                     //TODO: Make cards that are infront completly transparent and the cards behind darkened
-                    
-                    // Visual feedback - fade out other cards as dragged further up
-                    let progress = min(1.0, (translation.y - upHapticThreshold) / (view.bounds.width/2 - upHapticThreshold))
-                    setTransparencyForOtherCards(relativeTo: cardView, alpha: 1 - progress)
-                } else {
-                    // Reset transparency if not dragging up enough
-                    setTransparencyForOtherCards(relativeTo: cardView, alpha: 1.0)
                 }
                 
                 //MARK: DOWN BEHAVIOR
@@ -187,8 +242,9 @@ class CardStackViewController: UIViewController {
                         cardView.transform = originalTransform.translatedBy(x: 0, y: screenHeight)
                         cardView.alpha = 0
                     }) { _ in
-                        cardView.removeFromSuperview()
+                        self.removeCard(cardView)
                         // Call your completion handler here if needed
+                        //adjustCards()
                     }
                 } else {
                     // Spring back to original position
